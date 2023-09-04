@@ -36,7 +36,7 @@ module.exports = function(dbInyectada){
         //{ IdTipoMarcacion: 4, IdValidacion: 3, HoraInicio: '20:01', HoraFin: '23:59' },
     ];    
     // Compara la hora enviada con la tabla de parametrización
-    const horaFormateada = '12:00'//`${hora}:${minutos}`;
+    const horaFormateada = `${hora}:${minutos}`;
     
     // Función para validar la hora
     function validarHora(horaFormateada) {
