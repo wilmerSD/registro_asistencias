@@ -1,4 +1,5 @@
 const TABLA = 'asistencias';
+const parametrizacion = 'parametrizacion'
 
 module.exports = function(dbInyectada){
 
@@ -13,6 +14,17 @@ module.exports = function(dbInyectada){
     function uno(id){
         return db.uno(TABLA, id);
     }
+        async function obtenerTablaParametrizacion() {
+            //obtener la tabla de parametrización
+            return db.obtenerTablaParametrizacion(parametrizacion); // Debes implementar esta función en tu base de datos
+        }
+
+        async function usuarioYaMarcoHoy(IdUsuarios, IdTipoMarcacion) {
+            //verificar si el usuario ya marcó hoy con el mismo IdTipoMarcacion
+            const fechaHoy = new Date();
+            return db.usuarioYaMarcoHoy(TABLA, IdUsuarios, IdTipoMarcacion, fechaHoy);
+        }
+
     async function agregar(body){
 
         let fecha = new Date() || '';
@@ -21,20 +33,9 @@ module.exports = function(dbInyectada){
         const segundos = fecha.getSeconds();
  
     // Tabla de parametrización
-    const tablaParametrizacion = [
-        { IdTipoMarcacion: 1, IdValidacion: 1, HoraInicio: '6:00', HoraFin: '09:05' },
-        { IdTipoMarcacion: 1, IdValidacion: 2, HoraInicio: '9:06', HoraFin: '09:15' },
-        //{ IdTipoMarcacion: 1, IdValidacion: 3, HoraInicio: '9:16', HoraFin: '23:59' },
-        { IdTipoMarcacion: 2, IdValidacion: 1, HoraInicio: '12:00', HoraFin: '13:05' },
-        { IdTipoMarcacion: 2, IdValidacion: 2, HoraInicio: '13:06', HoraFin: '13:15' },
-        //{ IdTipoMarcacion: 2, IdValidacion: 3, HoraInicio: '13:16', HoraFin: '23:59' },
-        { IdTipoMarcacion: 3, IdValidacion: 1, HoraInicio: '13:55', HoraFin: '14:05' },
-        { IdTipoMarcacion: 3, IdValidacion: 2, HoraInicio: '14:06', HoraFin: '15:00' },
-        //{ IdTipoMarcacion: 3, IdValidacion: 3, HoraInicio: '15:01', HoraFin: '23:59' },
-        { IdTipoMarcacion: 4, IdValidacion: 1, HoraInicio: '18:00', HoraFin: '19:05' },
-        { IdTipoMarcacion: 4, IdValidacion: 2, HoraInicio: '19:06', HoraFin: '20:00' },
-        //{ IdTipoMarcacion: 4, IdValidacion: 3, HoraInicio: '20:01', HoraFin: '23:59' },
-    ];    
+    // Obtiene la tabla de parametrización desde la base de datos
+    const tablaParametrizacion = await obtenerTablaParametrizacion();
+ 
     // Compara la hora enviada con la tabla de parametrización
     const horaFormateada = '12:00'//`${hora}:${minutos}`;
     
@@ -66,7 +67,11 @@ module.exports = function(dbInyectada){
             return 'Falta';
     }
     const resultadoValidacion = validarHora(horaFormateada);
+    const yaMarcoHoy = await usuarioYaMarcoHoy(body.IdUsuarios, body.IdTipoMarcacion);
 
+    if (yaMarcoHoy) {
+        return 'El usuario ya marcó hoy con el mismo IdTipoMarcacion';
+    }
         const asistencias = {
             IdAsistencias:body.id,
             IdUsuarios: body.IdUsuarios,
@@ -79,6 +84,7 @@ module.exports = function(dbInyectada){
             Updated_at: '' ,
             Update_by: '',
         } 
+
         const respuesta = await db.agregar(TABLA, asistencias);
          return resultadoValidacion;
     }

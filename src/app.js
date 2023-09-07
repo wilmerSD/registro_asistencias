@@ -6,6 +6,7 @@ const usuarios = require('./modulos/usuarios/rutas')
 const auth = require('./modulos/auth/rutas')
 const asistencias = require('./modulos/asistencias/rutas')
 const error = require('./red/errors');
+const cronjob = require('./modulos/asistencias/inasistencias');
 const app = express();
 
 //Middleware
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //configuracion
 app.set('port', config.app.port)
+//app.use(cronjob);
 
 //rutas
 app.use('/api/usuarios', usuarios)

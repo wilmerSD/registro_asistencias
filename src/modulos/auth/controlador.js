@@ -14,13 +14,12 @@ module.exports = function(dbInyectada){
 
         return bcrypt.compare(password, data.Contraseña)
         .then(resultado =>{
-            if(resultado == true){
+            if(resultado){//resultado == true
                 const payload = {
                     IdUsuarios:data.IdUsuarios,
                     Nombres: data.Nombres,
                     Apellidos: data.Apellidos,
                     Usuario: data.Usuario,
-
                 };
                 // const token = auth.asignarToken(payload, SECRET_KEY, { expiresIn: '1h' });
                 return auth.asignarToken({...payload})
